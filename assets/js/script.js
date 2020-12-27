@@ -6,6 +6,7 @@ let tasksInProgressEl = document.querySelector("#tasks-in-progress");
 let tasksCompletedEl = document.querySelector("#tasks-completed");
 let formEl = document.querySelector("#task-form");
 let pageContentEl = document.querySelector("#page-content");
+let tasks = [];
 
 let completeEditTask = function(taskName, taskType, taskId) {
     let taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
@@ -26,6 +27,11 @@ let taskFormHandler = function(event) {
     let taskNameInput = document.querySelector("input[name='task-name']").value;
     let taskTypeInput = document.querySelector(".select-dropdown").value;
 
+    if(!taskNameInput || !taskTypeInput) {
+        alert("You need to fill out the task form!");
+        return false;
+    }
+
     let isEdit = formEl.hasAttribute("data-task-id");
 
     // has data attribute, so get task id and call function to complete edit process
@@ -36,14 +42,10 @@ let taskFormHandler = function(event) {
         let taskDataObj = {
             name: taskNameInput,
             type: taskTypeInput,
+            status: "to do",
         };
 
         createTaskEl(taskDataObj);
-    }
-
-    if(!taskNameInput || !taskTypeInput) {
-        alert("You need to fill out the task form!");
-        return false;
     }
     
     formEl.reset();
@@ -65,9 +67,9 @@ let createTaskEl = function(taskDataObj) {
     taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
 
     listItemEl.appendChild(taskInfoEl);
+    taskDataObj.id = taskIdCounter;
 
-    // add entire list item to list
-    tasksToDoEl.appendChild(listItemEl);
+    tasks.push(taskDataObj);
 
     let taskActionsEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionsEl);
@@ -143,9 +145,7 @@ let editTask = function(taskId) {
 
     // get content from task name and type
     let taskName = taskSelected.querySelector("h3.task-name").textContent;
-    console.log(taskName);
     let taskType = taskSelected.querySelector("span.task-type").textContent;
-    console.log(taskType);
 
     document.querySelector("input[name='task-name']").value = taskName;
     document.querySelector("select[name='task-type']").value = taskType;
@@ -180,7 +180,6 @@ let taskStatusChangeHandler = function(event) {
 let dragTaskHandler = function(event) {
     let taskId = event.target.getAttribute("data-task-id");
     event.dataTransfer.setData("text/plain", taskId);
-    let getId = event.dataTransfer.getData("text/plain");
 }
 
 let dropZoneDragHandler = function(event) {
@@ -197,9 +196,10 @@ let dropTaskHandler = function(event) {
     let draggableElement = document.querySelector(`.task-item[data-task-id="${id}"]`);
     let dropZoneEl = event.target.closest(".task-list");
     let statusType = dropZoneEl.id;
-    let statusSelectEl = draggableElement.querySelector("select[name='status-change']");
+    let statusSelectEl = draggableElement.querySelector('select[name="status-change"]');
+
     switch (statusType) {
-        case "task-to-do":
+        case "tasks-to-do":
             statusSelectEl.selectedIndex = 0;
             break;
         case "tasks-in-progress":
@@ -209,6 +209,7 @@ let dropTaskHandler = function(event) {
             statusSelectEl.selectedIndex = 2;
             break;
     }
+    
     dropZoneEl.removeAttribute("style");
     dropZoneEl.appendChild(draggableElement);
 }
