@@ -15,6 +15,14 @@ let completeEditTask = function(taskName, taskType, taskId) {
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
 
+    for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].name = taskName;
+            tasks[i].type = taskType;
+            break;
+        }
+    };
+ 
     alert("Task Updated");
 
     formEl.removeAttribute("data-task-id");
@@ -158,6 +166,16 @@ let editTask = function(taskId) {
 let deleteTask = function(taskId) {
     let taskSelected = document.querySelector( `.task-item[data-task-id="${taskId}"]` );
     taskSelected.remove();
+
+    let updatedTaskArr = [];
+
+    for(let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id !== parseInt(taskId)) {
+            updatedTaskArr.push(tasks[i]);
+        }
+    };
+
+    tasks = updatedTaskArr;
 };
 
 let taskStatusChangeHandler = function(event) {
@@ -175,6 +193,14 @@ let taskStatusChangeHandler = function(event) {
             tasksCompletedEl.appendChild(taskSelected);
             break;
     }
+
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].status = statusValue;
+            break;
+        }
+    }
+
 }
 
 let dragTaskHandler = function(event) {
@@ -208,6 +234,13 @@ let dropTaskHandler = function(event) {
         case "tasks-completed":
             statusSelectEl.selectedIndex = 2;
             break;
+    }
+
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(id)) {
+            tasks[i].status = statusType;
+            break;
+        }
     }
     
     dropZoneEl.removeAttribute("style");
