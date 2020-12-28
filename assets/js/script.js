@@ -66,6 +66,7 @@ let createTaskEl = function(taskDataObj) {
 
     // increase task counter for next unique ID
     taskIdCounter++;
+    return listItemEl
 }
 
 
@@ -273,35 +274,18 @@ let loadTasks = function() {
     // get task items from localStorage
     // convert tasks from the string format back into an array of objects
     // iterates through a tasks array and create task elements on the page from it
-    tasks = localStorage.getItem("tasks");
+    let savedTasks = localStorage.getItem("tasks");
 
-    if (!tasks) {
-        tasks = [];
+    if (!savedTasks) {
         return false;
-    };
+    }
     
-    tasks = JSON.parse(tasks);
+    savedTasks = JSON.parse(savedTasks);
 
-    for (let i = 0; i < tasks.length; i++) {
-        taskIdCounter = tasks[i].id;
-        
-        let listItemEl = document.createElement("li");
-        listItemEl.className = "task-item";
-        listItemEl.setAttribute("data-task-id", taskIdCounter);
-        listItemEl.setAttribute("draggable", true);
-        
-        let taskInfoEl = document.createElement("div");
-        taskInfoEl.className = "task-info";
-        taskInfoEl.innerHTML = `<h3 class='task-name'>${tasks[i].name}</h3><span class='task-type'>${tasks[i].type}</span>`;
-        
-        listItemEl.appendChild(taskInfoEl);
-
-        let taskActionsEl = createTaskActions(tasks[i].id);
-
-        listItemEl.appendChild(taskActionsEl);
-
+    for (let i = 0; i < savedTasks.length; i++) {
+        let listItemEl = createTaskEl(savedTasks[i]);
         let statusType = listItemEl.querySelector("select[name='status-change']");
-        switch (tasks[i].status) {
+        switch (savedTasks[i].status) {
             case "to do":
                 statusType.selectedIndex = 0;
                 tasksToDoEl.appendChild(listItemEl);
@@ -314,10 +298,9 @@ let loadTasks = function() {
                 statusType.selectedIndex = 2;
                 tasksCompletedEl.appendChild(listItemEl);
                 break;
-        }
-
-        console.log(listItemEl);
+        };
     }
+
 }
 
 pageContentEl.addEventListener("click", taskButtonhandler);
